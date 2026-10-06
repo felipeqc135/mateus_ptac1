@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 
 function Card({ titulo, children }) {
   return (
-    <div style={{ border: '1px solid #ccc', borderRadius: '6px', padding: '12px', marginBottom: '10px' }}>
-      {titulo && <h3 style={{ marginTop: 0, marginBottom: '8px' }}>{titulo}</h3>}
+    <div className="card">
+      {titulo && <h3>{titulo}</h3>}
       {children}
     </div>
   );
@@ -12,12 +12,12 @@ function Card({ titulo, children }) {
 function ItemIdeia({ ideia, onCurtir, onRemover }) {
   return (
     <Card titulo={ideia.titulo}>
-      <p style={{ margin: '0 0 10px 0' }}>{ideia.descricao}</p>
-      <div style={{ display: 'flex', gap: '8px' }}>
-        <button onClick={() => onCurtir(ideia.id)}>
+      <p>{ideia.descricao}</p>
+      <div className="acoes">
+        <button type="button" onClick={() => onCurtir(ideia.id)}>
           Curtir ({ideia.curtidas})
         </button>
-        <button onClick={() => onRemover(ideia.id)}>
+        <button type="button" onClick={() => onRemover(ideia.id)}>
           Remover
         </button>
       </div>
@@ -27,8 +27,8 @@ function ItemIdeia({ ideia, onCurtir, onRemover }) {
 
 export default function App() {
   const [ideias, setIdeias] = useState([
-    { id: 1, titulo: 'Criar App em React', descricao: 'Aplicação para gerir hábitos.', curtidas: 3 },
-    { id: 2, titulo: 'Modo Escuro no Painel', descricao: 'Alternar entre tema claro e escuro.', curtidas: 5 }
+    { id: '1', titulo: 'Criar App em React', descricao: 'Aplicação para gerir hábitos.', curtidas: 3 },
+    { id: '2', titulo: 'Modo Escuro no Painel', descricao: 'Alternar entre tema claro e escuro.', curtidas: 5 }
   ]);
 
   const [titulo, setTitulo] = useState('');
@@ -36,75 +36,84 @@ export default function App() {
   const [erro, setErro] = useState('');
   const [filtro, setFiltro] = useState('');
 
-  function aoSubmeter(e) {
+  function handleSubmit(e) {
     e.preventDefault();
 
-    if (titulo.trim() === '' || descricao.trim() === '') {
+    const tituloLimpo = titulo.trim();
+    const descricaoLimpa = descricao.trim();
+
+    if (!tituloLimpo || !descricaoLimpa) {
       setErro('Preencha todos os campos.');
       return;
     }
 
     const novaIdeia = {
-      id: Date.now(),
-      titulo: titulo.trim(),
-      descricao: descricao.trim(),
+      id: crypto.randomUUID(),
+      titulo: tituloLimpo,
+      descricao: descricaoLimpa,
       curtidas: 0
     };
 
-    setIdeias([novaIdeia, ...ideias]);
+    setIdeias((prevIdeias) => [novaIdeia, ...prevIdeias]);
     setTitulo('');
     setDescricao('');
     setErro('');
   }
 
   function handleCurtir(id) {
-    setIdeias(ideias.map((item) => 
-      item.id === id ? { ...item, curtidas: item.curtidas + 1 } : item
-    ));
+    setIdeias((prevIdeias) =>
+      prevIdeias.map((item) =>
+        item.id === id ? { ...item, curtidas: item.curtidas + 1 } : item
+      )
+    );
   }
 
   function handleRemover(id) {
-    setIdeias(ideias.filter((item) => item.id !== id));
+    setIdeias((prevIdeias) => prevIdeias.filter((item) => item.id !== id));
   }
 
+  const termoFiltro = filtro.toLowerCase();
   const ideiasFiltradas = ideias.filter(
     (item) =>
-      item.titulo.toLowerCase().includes(filtro.toLowerCase()) ||
-      item.descricao.toLowerCase().includes(filtro.toLowerCase())
+      item.titulo.toLowerCase().includes(termoFiltro) ||
+      item.descricao.toLowerCase().includes(termoFiltro)
   );
 
   return (
-    <div style={{ maxWidth: '500px', margin: '20px auto', fontFamily: 'sans-serif' }}>
+    <main className="container">
       <h1>Painel de Ideias</h1>
 
-      <form onSubmit={aoSubmeter} style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '20px' }}>
+      <form onSubmit={handleSubmit} className="formulario">
         <h3>Adicionar Ideia</h3>
+        
         <input
           type="text"
           placeholder="Título"
           value={titulo}
           onChange={(e) => setTitulo(e.target.value)}
         />
+        
         <textarea
           placeholder="Descrição"
           value={descricao}
           onChange={(e) => setDescricao(e.target.value)}
         />
-        {erro && <span style={{ color: 'red' }}>{erro}</span>}
+        
+        {erro && <span className="erro">{erro}</span>}
+        
         <button type="submit">Adicionar</button>
       </form>
 
-      <div style={{ marginBottom: '20px' }}>
+      <div className="busca">
         <input
           type="text"
           placeholder="Buscar..."
           value={filtro}
           onChange={(e) => setFiltro(e.target.value)}
-          style={{ width: '100%' }}
         />
       </div>
 
-      <div>
+      <section>
         <h3>Ideias ({ideiasFiltradas.length})</h3>
         {ideiasFiltradas.length === 0 ? (
           <p>Nenhuma ideia encontrada.</p>
@@ -118,7 +127,7 @@ export default function App() {
             />
           ))
         )}
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }
