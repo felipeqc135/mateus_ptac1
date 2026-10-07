@@ -75,3 +75,5 @@ export default function App() {
     </main>
   );
 }
+\\ cd Painel_Ideias
+\\ npm run dev
