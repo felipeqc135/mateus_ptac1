@@ -2,11 +2,8 @@ import React, { useState } from 'react';
 import './index.css';
 
 export default function App() {
-  const [ideias, setIdeias] = useState([
-    { id: 1, titulo: 'Criar app em React', curtidas: 3 },
-    { id: 2, titulo: 'Modo Escuro no Painel', curtidas: 5 }
-  ]);
-  
+
+  const [ideias, setIdeias] = useState([]);
   const [titulo, setTitulo] = useState('');
 
   function handleAdicionar(e) {
